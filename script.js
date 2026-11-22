@@ -273,7 +273,6 @@ const padangCreature = {
     leftHand: { x: width / 2 - 90, y: height * 0.58, vx: 0, vy: 0 },
     rightHand: { x: width / 2 + 90, y: height * 0.58, vx: 0, vy: 0 },
     sproutTip: { x: width / 2, y: height * 0.35, vx: 0, vy: 0 },
-    innerBubbles: [],
 
     init() {
         this.centerX = width / 2;
@@ -296,23 +295,12 @@ const padangCreature = {
 
         this.faceX = this.centerX;
         this.faceY = this.centerY;
-        this.leftHand.x = this.centerX - this.baseRadius * 0.95;
-        this.leftHand.y = this.centerY + 10;
-        this.rightHand.x = this.centerX + this.baseRadius * 0.95;
-        this.rightHand.y = this.centerY + 10;
+        this.leftHand.x = this.centerX - this.baseRadius * 1.25;
+        this.leftHand.y = this.centerY + 8;
+        this.rightHand.x = this.centerX + this.baseRadius * 1.25;
+        this.rightHand.y = this.centerY + 8;
         this.sproutTip.x = this.centerX;
-        this.sproutTip.y = this.centerY - this.baseRadius * 1.25;
-
-        this.innerBubbles = [];
-        for (let i = 0; i < 7; i++) {
-            this.innerBubbles.push({
-                angle: Math.random() * Math.PI * 2,
-                distRatio: 0.15 + Math.random() * 0.5,
-                r: 4 + Math.random() * 7,
-                speed: 0.5 + Math.random() * 0.9,
-                phase: Math.random() * Math.PI * 2
-            });
-        }
+        this.sproutTip.y = this.centerY - this.baseRadius * 1.05;
     },
 
     getRestOffset(angle, breathPhase) {
@@ -321,11 +309,11 @@ const padangCreature = {
         const breathX = 1 + Math.sin(breathPhase) * 0.032;
         const breathY = 1 - Math.sin(breathPhase) * 0.032;
 
-        const bottomSquash = sinA > 0 ? 1 - sinA * 0.16 : 1 + Math.abs(sinA) * 0.04;
-        const widthSpread = sinA > 0 ? 1 + sinA * 0.12 : 0.96;
+        const bottomSquash = sinA > 0 ? 1 - sinA * 0.14 : 1 + Math.abs(sinA) * 0.06;
+        const widthSpread = sinA > 0 ? 1.32 + sinA * 0.08 : 1.24;
 
         const rx = cosA * this.baseRadius * widthSpread * breathX;
-        const ry = sinA * this.baseRadius * bottomSquash * breathY;
+        const ry = sinA * this.baseRadius * 0.78 * bottomSquash * breathY;
         return { rx, ry };
     },
 
@@ -353,12 +341,12 @@ const padangCreature = {
             currentArea += (curr.x * next.y - next.x * curr.y);
         }
         currentArea = Math.abs(currentArea) * 0.5;
-        const targetArea = Math.PI * this.baseRadius * this.baseRadius * 0.96;
+        const targetArea = Math.PI * this.baseRadius * this.baseRadius * 1.22;
         const areaRatio = Math.max(0.5, Math.min(1.8, targetArea / Math.max(100, currentArea)));
         const pressureForce = (areaRatio - 1) * 420;
 
         const homeX = width / 2;
-        const homeY = this.floorY - this.baseRadius * 0.84;
+        const homeY = this.floorY - this.baseRadius * 0.65;
 
         let targetLookX = STATE.pointer.x;
         let targetLookY = STATE.pointer.y;
@@ -367,7 +355,7 @@ const padangCreature = {
             targetLookY = flyingFoods[0].y;
         }
         const lookDirX = Math.max(-1, Math.min(1, (targetLookX - this.centerX) / (width * 0.4)));
-        const swayX = Math.sin(now * 0.0022) * 10 + lookDirX * 14;
+        const swayX = Math.sin(now * 0.0028) * 16 + lookDirX * 18;
 
         const subSteps = 4;
         const subDt = dt / subSteps;
@@ -467,7 +455,7 @@ const padangCreature = {
         const parallaxY = (dyLook / distLook) * Math.min(distLook * 0.05, maxFaceShift * 0.8);
 
         const targetFaceX = this.centerX + parallaxX;
-        const targetFaceY = this.centerY + parallaxY + this.baseRadius * 0.04;
+        const targetFaceY = this.centerY + parallaxY - this.baseRadius * 0.03;
 
         this.faceVx = (this.faceVx + (targetFaceX - this.faceX) * 140 * dt) * Math.exp(-12 * dt);
         this.faceVy = (this.faceVy + (targetFaceY - this.faceY) * 140 * dt) * Math.exp(-12 * dt);
@@ -537,8 +525,8 @@ const padangCreature = {
     },
 
     updateSecondaryLimbs(dt, now) {
-        const leftAnchor = this.nodes[21];
-        const rightAnchor = this.nodes[7];
+        const leftAnchor = this.nodes[20];
+        const rightAnchor = this.nodes[8];
         const topAnchor = this.nodes[0];
 
         let waveL = Math.sin(now * 0.005) * 10;
@@ -570,7 +558,7 @@ const padangCreature = {
 
         const sproutSway = Math.sin(now * 0.004) * 12;
         const targetSX = topAnchor.x + sproutSway;
-        const targetSY = topAnchor.y - this.baseRadius * 0.28;
+        const targetSY = topAnchor.y - this.baseRadius * 0.24;
 
         this.sproutTip.vx = (this.sproutTip.vx + (targetSX - this.sproutTip.x) * 110 * dt) * Math.exp(-8 * dt);
         this.sproutTip.vy = (this.sproutTip.vy + (targetSY - this.sproutTip.y) * 110 * dt) * Math.exp(-8 * dt);
@@ -580,7 +568,7 @@ const padangCreature = {
 
     tryGrab(x, y) {
         let bestIdx = -1;
-        let bestDist = this.baseRadius * 1.35;
+        let bestDist = this.baseRadius * 1.45;
 
         for (let i = 0; i < this.numNodes; i++) {
             const d = Math.hypot(x - this.nodes[i].x, y - this.nodes[i].y);
@@ -590,7 +578,7 @@ const padangCreature = {
             }
         }
 
-        const distCenter = Math.hypot(x - this.centerX, y - this.centerY);
+        const distCenter = Math.hypot((x - this.centerX) / 1.32, (y - this.centerY) / 0.85);
         if (bestIdx !== -1 || distCenter <= this.baseRadius * 1.15) {
             if (bestIdx === -1) bestIdx = 0;
             this.grabbedNodeIndex = bestIdx;
@@ -618,7 +606,7 @@ const padangCreature = {
             if (speed > 260) {
                 SoundFX.playBoing(0.85 + Math.random() * 0.3, 0.24);
                 spawnRipple(this.centerX, this.centerY, NASI_PADANG_THEMES[STATE.themeIndex].core);
-                showSpeech('Weeee~ Nasi Padang terbang mantap! 🚀🍛');
+                showSpeech('Weeee~ Sepiring Nasi Padang terbang mantap! 🚀🍛');
             } else if (this.pettingAccum > 70) {
                 this.expression = 'love';
                 this.expressionTimer = 2.5;
@@ -634,14 +622,14 @@ const padangCreature = {
 
     handlePetting(x, y, moveDist) {
         const topNode = this.nodes[0];
-        const distToHead = Math.hypot(x - topNode.x, y - (topNode.y + this.baseRadius * 0.25));
-        if (distToHead < this.baseRadius * 0.95) {
+        const distToHead = Math.hypot(x - topNode.x, y - (topNode.y + this.baseRadius * 0.22));
+        if (distToHead < this.baseRadius * 1.05) {
             this.idleTimer = 0;
             this.pettingAccum += moveDist;
 
             for (let i = 0; i < this.numNodes; i++) {
                 const d = Math.hypot(x - this.nodes[i].x, y - this.nodes[i].y);
-                if (d < this.baseRadius * 0.65) {
+                if (d < this.baseRadius * 0.7) {
                     this.nodes[i].vy += 12;
                 }
             }
@@ -665,8 +653,8 @@ const padangCreature = {
             const dx = n.x - originX;
             const dy = n.y - originY;
             const dist = Math.hypot(dx, dy) || 1;
-            if (dist < this.baseRadius * 1.4) {
-                const falloff = 1 - dist / (this.baseRadius * 1.4);
+            if (dist < this.baseRadius * 1.55) {
+                const falloff = 1 - dist / (this.baseRadius * 1.55);
                 n.vx += (dx / dist) * strength * falloff;
                 n.vy += (dy / dist) * strength * falloff;
             }
@@ -696,8 +684,8 @@ const padangCreature = {
         this.expression = 'party';
         if (Math.random() < 0.45) {
             spawnParticleBurst(
-                this.centerX + (Math.random() - 0.5) * this.baseRadius * 1.5,
-                this.centerY - this.baseRadius * 0.7,
+                this.centerX + (Math.random() - 0.5) * this.baseRadius * 1.8,
+                this.centerY - this.baseRadius * 0.6,
                 5,
                 'confetti'
             );
@@ -785,9 +773,9 @@ const padangCreature = {
 
         ctx.save();
         ctx.translate(this.centerX, this.floorY + 6);
-        ctx.scale(shadowScale, 0.22 * shadowScale);
+        ctx.scale(shadowScale * 1.28, 0.22 * shadowScale);
         const shadowGrad = ctx.createRadialGradient(0, 0, 10, 0, 0, this.baseRadius * 1.25);
-        shadowGrad.addColorStop(0, 'rgba(12, 4, 32, 0.6)');
+        shadowGrad.addColorStop(0, 'rgba(12, 4, 32, 0.65)');
         shadowGrad.addColorStop(1, 'rgba(12, 4, 32, 0)');
         ctx.fillStyle = shadowGrad;
         ctx.beginPath();
@@ -801,37 +789,37 @@ const padangCreature = {
             ctx.globalAlpha = Math.min(1, STATE.auraTimer * 0.4) * 0.55;
             const auraGrad = ctx.createRadialGradient(
                 this.centerX, this.centerY, this.baseRadius * 0.5,
-                this.centerX, this.centerY, this.baseRadius * 1.75 * pulse
+                this.centerX, this.centerY, this.baseRadius * 1.85 * pulse
             );
             auraGrad.addColorStop(0, STATE.auraColor);
             auraGrad.addColorStop(1, 'rgba(255,255,255,0)');
             ctx.fillStyle = auraGrad;
             ctx.beginPath();
-            ctx.arc(this.centerX, this.centerY, this.baseRadius * 1.75 * pulse, 0, Math.PI * 2);
+            ctx.arc(this.centerX, this.centerY, this.baseRadius * 1.85 * pulse, 0, Math.PI * 2);
             ctx.fill();
             ctx.restore();
         }
 
         const topNode = this.nodes[0];
         ctx.save();
-        ctx.strokeStyle = '#4caf50';
-        ctx.lineWidth = Math.max(6, this.baseRadius * 0.085);
+        ctx.strokeStyle = '#66bb6a';
+        ctx.lineWidth = Math.max(6, this.baseRadius * 0.08);
         ctx.lineCap = 'round';
         ctx.beginPath();
-        ctx.moveTo(topNode.x, topNode.y + 6);
+        ctx.moveTo(topNode.x, topNode.y + 4);
         ctx.quadraticCurveTo(
             (topNode.x + this.sproutTip.x) * 0.5,
-            topNode.y - this.baseRadius * 0.14,
+            topNode.y - this.baseRadius * 0.12,
             this.sproutTip.x,
             this.sproutTip.y
         );
         ctx.stroke();
 
-        ctx.fillStyle = '#81c784';
-        ctx.shadowColor = 'rgba(129, 199, 132, 0.7)';
+        ctx.fillStyle = '#a5d6a7';
+        ctx.shadowColor = 'rgba(165, 214, 167, 0.7)';
         ctx.shadowBlur = 12;
         ctx.beginPath();
-        ctx.arc(this.sproutTip.x, this.sproutTip.y, this.baseRadius * 0.085, 0, Math.PI * 2);
+        ctx.arc(this.sproutTip.x, this.sproutTip.y, this.baseRadius * 0.08, 0, Math.PI * 2);
         ctx.fill();
         ctx.restore();
 
@@ -854,12 +842,12 @@ const padangCreature = {
             this.baseRadius * 0.1,
             this.centerX,
             this.centerY,
-            this.baseRadius * 1.25
+            this.baseRadius * 1.45
         );
-        bodyGrad.addColorStop(0, '#ffffff');
-        bodyGrad.addColorStop(0.32, '#fffdf5');
-        bodyGrad.addColorStop(0.75, theme.core);
-        bodyGrad.addColorStop(1, theme.mid);
+        bodyGrad.addColorStop(0, '#fffdf7');
+        bodyGrad.addColorStop(0.55, '#f7ebd2');
+        bodyGrad.addColorStop(0.85, '#e8cfa6');
+        bodyGrad.addColorStop(1, '#c89d66');
 
         ctx.fillStyle = bodyGrad;
         ctx.fill();
@@ -868,61 +856,99 @@ const padangCreature = {
         ctx.save();
         ctx.clip();
 
-        ctx.fillStyle = theme.mid;
+        ctx.save();
+        this.traceBodyPath(ctx);
+        ctx.lineWidth = 10;
+        ctx.strokeStyle = theme.mid;
+        ctx.stroke();
+        ctx.restore();
+
+        const riceGrad = ctx.createRadialGradient(
+            this.faceX,
+            this.faceY - this.baseRadius * 0.2,
+            this.baseRadius * 0.08,
+            this.centerX,
+            this.centerY - this.baseRadius * 0.05,
+            this.baseRadius * 0.92
+        );
+        riceGrad.addColorStop(0, '#ffffff');
+        riceGrad.addColorStop(0.75, '#fff9eb');
+        riceGrad.addColorStop(1, '#ede0c4');
+
+        ctx.fillStyle = riceGrad;
         ctx.beginPath();
         ctx.ellipse(
-            this.centerX + this.baseRadius * 0.34,
-            this.centerY + this.baseRadius * 0.45,
-            this.baseRadius * 0.32,
-            this.baseRadius * 0.2,
-            0.22 + this.faceAngle * 0.5,
+            this.centerX + this.faceAngle * 14,
+            this.centerY - this.baseRadius * 0.06,
+            this.baseRadius * 0.86,
+            this.baseRadius * 0.48,
+            this.faceAngle * 0.4,
             0,
             Math.PI * 2
         );
         ctx.fill();
 
-        ctx.fillStyle = '#388e3c';
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+        for (let g = 0; g < 10; g++) {
+            const gx = this.centerX + Math.cos(g * 1.3 + now * 0.001) * (this.baseRadius * 0.45);
+            const gy = this.centerY - this.baseRadius * 0.14 + Math.sin(g * 1.9) * (this.baseRadius * 0.22);
+            ctx.beginPath();
+            ctx.ellipse(gx, gy, 4.2, 2.3, (g % 3) * 0.5, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        ctx.fillStyle = theme.mid;
+        ctx.strokeStyle = theme.deep;
+        ctx.lineWidth = 2;
         ctx.beginPath();
         ctx.ellipse(
-            this.centerX - this.baseRadius * 0.35,
-            this.centerY + this.baseRadius * 0.46,
-            this.baseRadius * 0.32,
+            this.centerX + this.baseRadius * 0.68,
+            this.centerY + this.baseRadius * 0.12,
+            this.baseRadius * 0.28,
             this.baseRadius * 0.19,
-            -0.2 + this.faceAngle * 0.5,
+            0.25 + this.faceAngle * 0.5,
             0,
             Math.PI * 2
         );
         ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = '#388e3c';
+        ctx.strokeStyle = '#1b5e20';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.ellipse(
+            this.centerX - this.baseRadius * 0.68,
+            this.centerY + this.baseRadius * 0.14,
+            this.baseRadius * 0.28,
+            this.baseRadius * 0.18,
+            -0.22 + this.faceAngle * 0.5,
+            0,
+            Math.PI * 2
+        );
+        ctx.fill();
+        ctx.stroke();
 
         ctx.fillStyle = '#7cb342';
         ctx.beginPath();
         ctx.ellipse(
             this.centerX,
-            this.centerY + this.baseRadius * 0.56,
-            this.baseRadius * 0.24,
-            this.baseRadius * 0.14,
+            this.centerY + this.baseRadius * 0.36,
+            this.baseRadius * 0.34,
+            this.baseRadius * 0.13,
             this.faceAngle * 0.5,
             0,
             Math.PI * 2
         );
         ctx.fill();
 
-        this.innerBubbles.forEach((ib) => {
-            const bx = this.centerX + Math.cos(ib.angle + now * 0.0008 * ib.speed) * (this.baseRadius * ib.distRatio);
-            const by = this.centerY + Math.sin(ib.angle + now * 0.001 * ib.speed + ib.phase) * (this.baseRadius * ib.distRatio * 0.75);
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.35)';
-            ctx.beginPath();
-            ctx.arc(bx, by, ib.r * 0.7, 0, Math.PI * 2);
-            ctx.fill();
-        });
-
         const hlNode = this.nodes[24];
         ctx.save();
         ctx.translate((this.centerX + hlNode.x) * 0.5 - 6, (this.centerY + hlNode.y) * 0.5 - 8);
-        ctx.rotate(-0.55 + this.faceAngle);
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.78)';
+        ctx.rotate(-0.45 + this.faceAngle);
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.72)';
         ctx.beginPath();
-        ctx.ellipse(0, 0, this.baseRadius * 0.24, this.baseRadius * 0.095, 0, 0, Math.PI * 2);
+        ctx.ellipse(0, 0, this.baseRadius * 0.22, this.baseRadius * 0.08, 0, 0, Math.PI * 2);
         ctx.fill();
         ctx.restore();
 
@@ -946,18 +972,18 @@ const padangCreature = {
     },
 
     drawHands(ctx, theme) {
-        const leftAnchor = this.nodes[21];
-        const rightAnchor = this.nodes[7];
-        const handRadius = this.baseRadius * 0.14;
+        const leftAnchor = this.nodes[20];
+        const rightAnchor = this.nodes[8];
+        const handRadius = this.baseRadius * 0.13;
 
         [
             { anchor: leftAnchor, tip: this.leftHand },
             { anchor: rightAnchor, tip: this.rightHand }
         ].forEach(({ anchor, tip }) => {
             ctx.save();
-            ctx.strokeStyle = theme.mid;
-            ctx.fillStyle = theme.core;
-            ctx.lineWidth = handRadius * 1.55;
+            ctx.strokeStyle = '#e8cfa6';
+            ctx.fillStyle = '#fff9eb';
+            ctx.lineWidth = handRadius * 1.5;
             ctx.lineCap = 'round';
 
             ctx.beginPath();
@@ -977,16 +1003,16 @@ const padangCreature = {
         ctx.translate(this.faceX, this.faceY);
         ctx.rotate(this.faceAngle);
 
-        const eyeSpacing = this.baseRadius * 0.33;
-        const eyeY = -this.baseRadius * 0.04;
-        const eyeRadius = this.baseRadius * 0.145;
+        const eyeSpacing = this.baseRadius * 0.34;
+        const eyeY = -this.baseRadius * 0.06;
+        const eyeRadius = this.baseRadius * 0.135;
         const chewPuff = this.chewTimer > 0 ? 1 + Math.abs(Math.sin(now * 0.022)) * 0.35 : 1;
 
         ctx.fillStyle = theme.cheek;
         ctx.globalAlpha = this.chewTimer > 0 ? 0.65 : 0.45;
         ctx.beginPath();
-        ctx.ellipse(-eyeSpacing * 1.32, eyeY + eyeRadius * 1.25, eyeRadius * 0.85 * chewPuff, eyeRadius * 0.52 * chewPuff, 0, 0, Math.PI * 2);
-        ctx.ellipse(eyeSpacing * 1.32, eyeY + eyeRadius * 1.25, eyeRadius * 0.85 * chewPuff, eyeRadius * 0.52 * chewPuff, 0, 0, Math.PI * 2);
+        ctx.ellipse(-eyeSpacing * 1.28, eyeY + eyeRadius * 1.15, eyeRadius * 0.82 * chewPuff, eyeRadius * 0.48 * chewPuff, 0, 0, Math.PI * 2);
+        ctx.ellipse(eyeSpacing * 1.28, eyeY + eyeRadius * 1.15, eyeRadius * 0.82 * chewPuff, eyeRadius * 0.48 * chewPuff, 0, 0, Math.PI * 2);
         ctx.fill();
         ctx.globalAlpha = 1;
 
@@ -1045,7 +1071,7 @@ const padangCreature = {
             ctx.restore();
         });
 
-        const mouthY = eyeY + eyeRadius * 1.25;
+        const mouthY = eyeY + eyeRadius * 1.15;
         ctx.strokeStyle = '#2d144d';
         ctx.fillStyle = '#ff5c8a';
         ctx.lineWidth = 3.8;
@@ -1059,8 +1085,8 @@ const padangCreature = {
             ctx.stroke();
         } else if (this.expression === 'eating' || this.expression === 'surprised') {
             ctx.beginPath();
-            const rMouth = this.expression === 'eating' ? eyeRadius * 0.88 : eyeRadius * 0.56;
-            ctx.arc(0, mouthY + 4, rMouth, 0, Math.PI * 2);
+            const rMouth = this.expression === 'eating' ? eyeRadius * 0.85 : eyeRadius * 0.54;
+            ctx.arc(0, mouthY + 3, rMouth, 0, Math.PI * 2);
             ctx.fill();
             ctx.stroke();
         } else if (this.expression === 'sleepy') {
@@ -1069,8 +1095,8 @@ const padangCreature = {
             ctx.stroke();
         } else {
             ctx.beginPath();
-            ctx.arc(-eyeRadius * 0.36, mouthY, eyeRadius * 0.36, 0.1 * Math.PI, 0.9 * Math.PI);
-            ctx.arc(eyeRadius * 0.36, mouthY, eyeRadius * 0.36, 0.1 * Math.PI, 0.9 * Math.PI);
+            ctx.arc(-eyeRadius * 0.36, mouthY, eyeRadius * 0.34, 0.1 * Math.PI, 0.9 * Math.PI);
+            ctx.arc(eyeRadius * 0.36, mouthY, eyeRadius * 0.34, 0.1 * Math.PI, 0.9 * Math.PI);
             ctx.stroke();
         }
 
@@ -1094,8 +1120,8 @@ const padangCreature = {
     drawCatEars(ctx, theme) {
         const r = this.baseRadius;
         const earConfigs = [
-            { node: this.nodes[25], side: -1 },
-            { node: this.nodes[3], side: 1 }
+            { node: this.nodes[24], side: -1 },
+            { node: this.nodes[4], side: 1 }
         ];
         earConfigs.forEach(({ node, side }) => {
             ctx.save();
@@ -1126,7 +1152,7 @@ const padangCreature = {
         const r = this.baseRadius;
         const topNode = this.nodes[0];
         ctx.save();
-        ctx.translate(topNode.x, topNode.y + 4);
+        ctx.translate(topNode.x, topNode.y + 2);
         ctx.rotate(-0.08 + this.faceAngle * 1.2);
 
         ctx.fillStyle = '#3b1d6e';
@@ -1159,7 +1185,7 @@ const padangCreature = {
         const r = this.baseRadius;
         const topNode = this.nodes[0];
         ctx.save();
-        ctx.translate(topNode.x, topNode.y + 4);
+        ctx.translate(topNode.x, topNode.y + 2);
         ctx.rotate(this.faceAngle * 1.2);
 
         const grad = ctx.createLinearGradient(0, -r * 0.4, 0, 0);
@@ -1190,8 +1216,8 @@ const padangCreature = {
 
     drawSunglasses(ctx) {
         const r = this.baseRadius;
-        const eyeSpacing = r * 0.33;
-        const eyeY = -r * 0.04;
+        const eyeSpacing = r * 0.34;
+        const eyeY = -r * 0.06;
 
         ctx.save();
         ctx.translate(this.faceX + this.eyeLookX * 0.4, this.faceY + eyeY + this.eyeLookY * 0.4);
@@ -1338,21 +1364,190 @@ for (let i = 0; i < 65; i++) {
     });
 }
 
-const swayingPlates = [];
-function spawnSwayingPlate() {
-    if (swayingPlates.length >= 10) return;
-    swayingPlates.push({
-        x: 50 + Math.random() * (width - 100),
-        y: height + 40,
-        r: 22 + Math.random() * 14,
-        vy: 24 + Math.random() * 26,
-        swayPhase: Math.random() * Math.PI * 2,
-        swaySpeed: 2.2 + Math.random() * 1.8
+const bgClouds = [];
+for (let i = 0; i < 5; i++) {
+    bgClouds.push({
+        x: Math.random() * width,
+        y: height * (0.12 + Math.random() * 0.22),
+        scale: 0.75 + Math.random() * 0.55,
+        speed: 8 + Math.random() * 10,
+        phase: Math.random() * Math.PI * 2
     });
 }
-for (let i = 0; i < 6; i++) {
-    spawnSwayingPlate();
-    swayingPlates[i].y = height * (0.2 + Math.random() * 0.65);
+
+function drawCuteRumahGadang(ctx, now) {
+    const groundY = Math.min(height * 0.80, height - 115);
+    const houseCenterX = width * 0.5;
+    const houseW = Math.min(width * 0.62, 460);
+    const houseH = Math.min(height * 0.24, 155);
+    const baseY = groundY + 6;
+    const sway = Math.sin(now * 0.002) * 3.5;
+
+    ctx.save();
+
+    ctx.fillStyle = 'rgba(76, 38, 130, 0.55)';
+    ctx.beginPath();
+    ctx.moveTo(0, groundY + 10);
+    ctx.quadraticCurveTo(width * 0.22, groundY - houseH * 0.95, width * 0.52, groundY - houseH * 0.45);
+    ctx.quadraticCurveTo(width * 0.8, groundY - houseH * 1.1, width, groundY - houseH * 0.35);
+    ctx.lineTo(width, height);
+    ctx.lineTo(0, height);
+    ctx.closePath();
+    ctx.fill();
+
+    bgClouds.forEach((c) => {
+        c.x += c.speed * 0.016;
+        if (c.x > width + 120) c.x = -120;
+        const bobY = c.y + Math.sin(now * 0.0015 + c.phase) * 5;
+
+        ctx.save();
+        ctx.translate(c.x, bobY);
+        ctx.scale(c.scale, c.scale);
+        ctx.fillStyle = 'rgba(255, 240, 250, 0.22)';
+        ctx.beginPath();
+        ctx.arc(0, 0, 22, 0, Math.PI * 2);
+        ctx.arc(20, -4, 26, 0, Math.PI * 2);
+        ctx.arc(44, 2, 20, 0, Math.PI * 2);
+        ctx.arc(-20, 4, 18, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+    });
+
+    const bodyW = houseW * 0.78;
+    const bodyH = houseH * 0.48;
+    const bodyLeft = houseCenterX - bodyW * 0.5 + sway * 0.4;
+    const bodyTop = baseY - bodyH;
+
+    ctx.fillStyle = '#3c1810';
+    const postCount = 6;
+    for (let p = 0; p < postCount; p++) {
+        const px = bodyLeft + 14 + (p / (postCount - 1)) * (bodyW - 28);
+        ctx.fillRect(px - 4, bodyTop + bodyH * 0.55, 8, bodyH * 0.45);
+    }
+
+    const wallGrad = ctx.createLinearGradient(0, bodyTop, 0, baseY);
+    wallGrad.addColorStop(0, '#8d4324');
+    wallGrad.addColorStop(1, '#5b2511');
+    ctx.fillStyle = wallGrad;
+    ctx.strokeStyle = '#ffd54f';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.roundRect(bodyLeft, bodyTop, bodyW, bodyH * 0.72, 8);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.strokeStyle = 'rgba(255, 213, 79, 0.45)';
+    ctx.lineWidth = 1.5;
+    for (let u = 1; u <= 4; u++) {
+        const ux = bodyLeft + (u / 5) * bodyW;
+        ctx.beginPath();
+        ctx.moveTo(ux, bodyTop + 10);
+        ctx.lineTo(ux, bodyTop + bodyH * 0.64);
+        ctx.stroke();
+    }
+
+    const winGlow = 0.75 + 0.25 * Math.sin(now * 0.004);
+    const winCount = 3;
+    for (let w = 0; w < winCount; w++) {
+        const wx = bodyLeft + bodyW * 0.22 + w * (bodyW * 0.28);
+        const wy = bodyTop + bodyH * 0.22;
+        const ww = Math.min(34, bodyW * 0.12);
+        const wh = Math.min(28, bodyH * 0.34);
+
+        ctx.fillStyle = `rgba(255, 230, 128, ${winGlow})`;
+        ctx.strokeStyle = '#ffd54f';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.roundRect(wx - ww * 0.5, wy - wh * 0.5, ww, wh, 5);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.strokeStyle = '#6d2f16';
+        ctx.lineWidth = 1.4;
+        ctx.beginPath();
+        ctx.moveTo(wx, wy - wh * 0.5);
+        ctx.lineTo(wx, wy + wh * 0.5);
+        ctx.stroke();
+    }
+
+    const roofBaseY = bodyTop + 6;
+    const gonjongTopY = roofBaseY - houseH * 0.72;
+    const leftTipX = houseCenterX - houseW * 0.54 + sway;
+    const rightTipX = houseCenterX + houseW * 0.54 + sway;
+    const midPeakX = houseCenterX + sway * 0.7;
+
+    const roofGrad = ctx.createLinearGradient(0, gonjongTopY, 0, roofBaseY);
+    roofGrad.addColorStop(0, '#2a164d');
+    roofGrad.addColorStop(0.55, '#4b247a');
+    roofGrad.addColorStop(1, '#7c3aed');
+
+    ctx.fillStyle = roofGrad;
+    ctx.strokeStyle = '#ffd54f';
+    ctx.lineWidth = 2.8;
+
+    ctx.beginPath();
+    ctx.moveTo(leftTipX, roofBaseY - 12);
+    ctx.quadraticCurveTo(houseCenterX - houseW * 0.34 + sway * 0.8, gonjongTopY + 12, houseCenterX - houseW * 0.24 + sway * 0.8, gonjongTopY + 4);
+    ctx.quadraticCurveTo(houseCenterX - houseW * 0.1 + sway * 0.7, roofBaseY - houseH * 0.36, midPeakX, gonjongTopY - 8);
+    ctx.quadraticCurveTo(houseCenterX + houseW * 0.12 + sway * 0.7, roofBaseY - houseH * 0.36, houseCenterX + houseW * 0.24 + sway * 0.8, gonjongTopY + 4);
+    ctx.quadraticCurveTo(houseCenterX + houseW * 0.34 + sway * 0.8, gonjongTopY + 12, rightTipX, roofBaseY - 12);
+    ctx.quadraticCurveTo(houseCenterX + sway * 0.4, roofBaseY + 6, leftTipX, roofBaseY - 12);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+
+    const lanternSwing = Math.sin(now * 0.0035) * 0.14;
+    [-houseW * 0.24, houseW * 0.24].forEach((lx, idx) => {
+        ctx.save();
+        ctx.translate(houseCenterX + lx + sway * 0.6, roofBaseY + 2);
+        ctx.rotate(lanternSwing * (idx === 0 ? 1 : -1));
+        ctx.strokeStyle = '#ffd54f';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(0, 10);
+        ctx.stroke();
+
+        ctx.fillStyle = '#ff7eb9';
+        ctx.beginPath();
+        ctx.arc(0, 15, 6, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+    });
+
+    const floorGrad = ctx.createLinearGradient(0, groundY, 0, height);
+    floorGrad.addColorStop(0, 'rgba(92, 45, 138, 0.55)');
+    floorGrad.addColorStop(1, 'rgba(22, 9, 54, 0.85)');
+    ctx.fillStyle = floorGrad;
+    ctx.fillRect(0, groundY, width, height - groundY);
+
+    ctx.strokeStyle = 'rgba(255, 213, 79, 0.35)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(0, groundY);
+    ctx.lineTo(width, groundY);
+    ctx.stroke();
+
+    ctx.restore();
+}
+
+const swayingSnacks = [];
+function spawnSwayingSnack() {
+    if (swayingSnacks.length >= 12) return;
+    const snackType = Math.random() < 0.5 ? 'kerupuk' : 'udang';
+    swayingSnacks.push({
+        type: snackType,
+        x: 45 + Math.random() * (width - 90),
+        y: height + 40,
+        r: 18 + Math.random() * 11,
+        vy: 24 + Math.random() * 28,
+        swayPhase: Math.random() * Math.PI * 2,
+        swaySpeed: 2.2 + Math.random() * 1.9
+    });
+}
+for (let i = 0; i < 7; i++) {
+    spawnSwayingSnack();
+    swayingSnacks[i].y = height * (0.18 + Math.random() * 0.68);
 }
 
 const particles = [];
@@ -1423,6 +1618,76 @@ function drawStar(ctx, cx, cy, spikes, outerR, innerR, fill, stroke) {
     }
 }
 
+function drawKerupukKulit(ctx, r) {
+    const grad = ctx.createRadialGradient(-r * 0.2, -r * 0.2, 2, 0, 0, r * 1.15);
+    grad.addColorStop(0, '#ffd27d');
+    grad.addColorStop(0.55, '#c8752d');
+    grad.addColorStop(1, '#7c3f12');
+
+    ctx.fillStyle = grad;
+    ctx.strokeStyle = '#ffebb3';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    const lobes = 10;
+    for (let i = 0; i <= lobes * 2; i++) {
+        const ang = (i / (lobes * 2)) * Math.PI * 2;
+        const rad = i % 2 === 0 ? r * 1.05 : r * 0.82;
+        const px = Math.cos(ang) * rad;
+        const py = Math.sin(ang) * rad * 0.78;
+        if (i === 0) ctx.moveTo(px, py);
+        else ctx.lineTo(px, py);
+    }
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.fillStyle = 'rgba(255, 244, 214, 0.45)';
+    ctx.beginPath();
+    ctx.arc(-r * 0.3, -r * 0.12, r * 0.14, 0, Math.PI * 2);
+    ctx.arc(r * 0.25, r * 0.14, r * 0.12, 0, Math.PI * 2);
+    ctx.arc(r * 0.1, -r * 0.28, r * 0.09, 0, Math.PI * 2);
+    ctx.fill();
+}
+
+function drawUdang(ctx, r) {
+    const grad = ctx.createLinearGradient(-r * 0.8, -r * 0.6, r * 0.8, r * 0.6);
+    grad.addColorStop(0, '#ff9e7d');
+    grad.addColorStop(0.5, '#ff6b4a');
+    grad.addColorStop(1, '#d63a2f');
+
+    ctx.fillStyle = grad;
+    ctx.strokeStyle = '#ffe5d9';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(-r * 0.55, -r * 0.45);
+    ctx.quadraticCurveTo(r * 0.55, -r * 0.75, r * 0.65, r * 0.15);
+    ctx.quadraticCurveTo(r * 0.45, r * 0.72, -r * 0.35, r * 0.58);
+    ctx.quadraticCurveTo(-r * 0.15, r * 0.22, -r * 0.55, -r * 0.45);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.strokeStyle = 'rgba(255, 240, 230, 0.65)';
+    ctx.lineWidth = 1.6;
+    for (let s = 1; s <= 3; s++) {
+        const t = s / 4;
+        const sx = -r * 0.25 + t * r * 0.75;
+        const sy = -r * 0.25 + t * r * 0.55;
+        ctx.beginPath();
+        ctx.arc(sx, sy, r * 0.24, -0.4, 1.3);
+        ctx.stroke();
+    }
+
+    ctx.fillStyle = '#ff7b5c';
+    ctx.beginPath();
+    ctx.moveTo(-r * 0.45, -r * 0.38);
+    ctx.lineTo(-r * 0.92, -r * 0.65);
+    ctx.lineTo(-r * 0.78, -r * 0.18);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+}
+
 function handlePointerDown(clientX, clientY) {
     STATE.pointer.x = clientX;
     STATE.pointer.y = clientY;
@@ -1430,17 +1695,21 @@ function handlePointerDown(clientX, clientY) {
     STATE.pointer.prevY = clientY;
     STATE.pointer.isDown = true;
 
-    for (let i = swayingPlates.length - 1; i >= 0; i--) {
-        const p = swayingPlates[i];
-        const dist = Math.hypot(clientX - p.x, clientY - p.y);
-        if (dist <= p.r + 14) {
+    for (let i = swayingSnacks.length - 1; i >= 0; i--) {
+        const s = swayingSnacks[i];
+        const dist = Math.hypot(clientX - s.x, clientY - s.y);
+        if (dist <= s.r + 14) {
             SoundFX.playEat();
-            spawnParticleBurst(p.x, p.y, 14, 'star');
+            spawnParticleBurst(s.x, s.y, 14, 'star');
             padangCreature.expression = 'love';
             padangCreature.expressionTimer = 1.6;
             padangCreature.updateMoodText();
-            showSpeech('Waaah! Piring Nasi Padang bergoyang lewat! 🍛✨');
-            swayingPlates.splice(i, 1);
+            if (s.type === 'kerupuk') {
+                showSpeech('Kriuk! Kerupuk kulitnya renyah bergoyang! 🍘✨');
+            } else {
+                showSpeech('Yummy! Udang gurihnya ikut bergoyang! 🍤💖');
+            }
+            swayingSnacks.splice(i, 1);
             return;
         }
     }
@@ -1534,7 +1803,7 @@ partyBtn.addEventListener('click', () => {
 });
 
 let lastTime = performance.now();
-let plateTimer = 0;
+let snackTimer = 0;
 
 function animate(now) {
     const dt = Math.min((now - lastTime) / 1000, 0.05);
@@ -1575,54 +1844,34 @@ function animate(now) {
     });
     ctx.globalAlpha = 1;
 
-    plateTimer += dt;
-    if (plateTimer > 1.6) {
-        spawnSwayingPlate();
-        plateTimer = 0;
+    drawCuteRumahGadang(ctx, now);
+
+    snackTimer += dt;
+    if (snackTimer > 1.45) {
+        spawnSwayingSnack();
+        snackTimer = 0;
     }
 
-    for (let i = swayingPlates.length - 1; i >= 0; i--) {
-        const p = swayingPlates[i];
-        p.y -= p.vy * dt;
-        const swayAngle = Math.sin(now * 0.001 * p.swaySpeed + p.swayPhase) * 0.24;
-        p.x += Math.sin(now * 0.002 + p.swayPhase) * 0.8;
+    for (let i = swayingSnacks.length - 1; i >= 0; i--) {
+        const s = swayingSnacks[i];
+        s.y -= s.vy * dt;
+        const swayAngle = Math.sin(now * 0.001 * s.swaySpeed + s.swayPhase) * 0.32;
+        s.x += Math.sin(now * 0.002 + s.swayPhase) * 0.85;
 
-        if (p.y < -60) {
-            swayingPlates.splice(i, 1);
+        if (s.y < -60) {
+            swayingSnacks.splice(i, 1);
             continue;
         }
 
         ctx.save();
-        ctx.translate(p.x, p.y);
+        ctx.translate(s.x, s.y);
         ctx.rotate(swayAngle);
 
-        ctx.fillStyle = '#fff9eb';
-        ctx.strokeStyle = '#ffd54f';
-        ctx.lineWidth = 2.5;
-        ctx.beginPath();
-        ctx.ellipse(0, 2, p.r * 1.15, p.r * 0.78, 0, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.stroke();
-
-        ctx.fillStyle = '#ffffff';
-        ctx.beginPath();
-        ctx.ellipse(0, -2, p.r * 0.65, p.r * 0.45, 0, 0, Math.PI * 2);
-        ctx.fill();
-
-        ctx.fillStyle = '#8d4925';
-        ctx.beginPath();
-        ctx.ellipse(p.r * 0.42, -1, p.r * 0.26, p.r * 0.17, 0.2, 0, Math.PI * 2);
-        ctx.fill();
-
-        ctx.fillStyle = '#388e3c';
-        ctx.beginPath();
-        ctx.ellipse(-p.r * 0.42, 0, p.r * 0.25, p.r * 0.16, -0.2, 0, Math.PI * 2);
-        ctx.fill();
-
-        ctx.fillStyle = '#7cb342';
-        ctx.beginPath();
-        ctx.ellipse(0, p.r * 0.36, p.r * 0.2, p.r * 0.12, 0, 0, Math.PI * 2);
-        ctx.fill();
+        if (s.type === 'kerupuk') {
+            drawKerupukKulit(ctx, s.r);
+        } else {
+            drawUdang(ctx, s.r);
+        }
 
         ctx.restore();
     }
@@ -1698,7 +1947,7 @@ function animate(now) {
 
 window.onload = () => {
     setTimeout(() => {
-        showSpeech('Boing~ Tarik Nasi Padangku atau klik piring bergoyang ya! 🍛✨', 3400);
+        showSpeech('Boing~ Tarik Nasi Padangku atau klik kerupuk & udang bergoyang ya! 🍛✨', 3400);
     }, 600);
     requestAnimationFrame(animate);
 };
