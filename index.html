@@ -4,14 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Taman Kosmik Makhluk Nasi Padang</title>
+    <!-- Memuat font Fredoka untuk tampilan ceria dan membulat -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Menghubungkan berkas gaya eksternal -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <!-- Kanvas utama tempat simulasi dan karakter digambar -->
     <canvas id="cosmicCanvas"></canvas>
 
+    <!-- Lapisan antarmuka pengguna (HUD & tombol aksi) -->
     <div class="ui-layer">
         <div>
             <header class="top-bar">
@@ -35,10 +39,11 @@
                 <button id="costumeBtn" class="cute-btn btn-costume" type="button">🎩 Ganti Kostum</button>
                 <button id="partyBtn" class="cute-btn btn-party" type="button">🪩 Mode Dansa</button>
             </div>
-            <p class="hint-text">Tarik &amp; lempar Nasi Padang, usap puncaknya, atau klik piring yang bergoyang! 🍛✨</p>
+            <p class="hint-text">Tarik &amp; lempar Nasi Padang, usap puncaknya, atau klik kerupuk &amp; udang bergoyang! 🍛✨</p>
         </footer>
     </div>
 
+    <!-- Menghubungkan berkas logika & animasi eksternal -->
     <script src="script.js"></script>
 </body>
 </html>
